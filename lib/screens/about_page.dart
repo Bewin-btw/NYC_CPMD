@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart'; // Импорт главного экрана
+import '../utils/constants.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -6,12 +8,12 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F4FF),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF6A5AE0), Color(0xFF4A4DE9)],
+              colors: [AppColors.primary, AppColors.secondary],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -25,24 +27,24 @@ class AboutPage extends StatelessWidget {
         elevation: 4,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(AppDimensions.padding),
         child: Card(
           elevation: 6,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppDimensions.borderRadius),
           ),
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: ListView(
               children: [
-                const Icon(Icons.games, size: 50, color: Color(0xFF6A5AE0)),
+                const Icon(Icons.games, size: 50, color: AppColors.primary),
                 const SizedBox(height: 16),
                 const Text(
                   '📱 Truth or Action',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4A4DE9),
+                    color: AppColors.secondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -60,7 +62,7 @@ class AboutPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF4A4DE9),
+                    color: AppColors.secondary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -73,11 +75,11 @@ class AboutPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                 onPressed: () => _navigateToHome(context),
                   icon: const Icon(Icons.play_arrow),
                   label: const Text('Start Game'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6A5AE0),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     textStyle: const TextStyle(fontSize: 16),
@@ -93,4 +95,20 @@ class AboutPage extends StatelessWidget {
       ),
     );
   }
+}
+
+void _navigateToHome(BuildContext context) {
+  Navigator.pushReplacement(
+    context,
+    PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 700),
+      pageBuilder: (_, animation, secondaryAnimation) => SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1.0, 0.0),
+          end: Offset.zero,
+        ).animate(animation),
+        child: const HomePage(),
+      ),
+    ),
+  );
 }
