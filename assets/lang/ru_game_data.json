@@ -1,0 +1,107 @@
+{
+    "categories": [
+      {
+        "id": "dance",
+        "name": "Dance Challenge",
+        "actions": [
+          "Do a funny dance for 30 seconds",
+          "Dance without music for one minute",
+          "Perform your favorite TikTok move"
+        ]
+      },
+      {
+        "id": "call",
+        "name": "Call Someone",
+        "actions": [
+          "Call your crush and confess your feelings",
+          "Call a random contact and sing a song",
+          "Call your best friend and say something random"
+        ]
+      },
+      {
+        "id": "fitness",
+        "name": "Fitness Challenge",
+        "actions": [
+          "Do 15 push-ups",
+          "Hold a plank for 1 minute",
+          "Do 30 jumping jacks"
+        ]
+      },
+      {
+        "id": "selfie",
+        "name": "Funny Selfie",
+        "actions": [
+          "Take a selfie while making a silly face",
+          "Take a selfie with your eyes closed",
+          "Imitate an animal and take a selfie"
+        ]
+      },
+      {
+        "id": "robot",
+        "name": "Robot Voice",
+        "actions": [
+          "Talk like a robot for one minute",
+          "Sing a song in robot voice",
+          "Explain a movie plot using robot sounds"
+        ]
+      },
+      {
+        "id": "social",
+        "name": "Social Media",
+        "actions": [
+          "Post an old selfie on your story",
+          "Comment 'I love broccoli' on your last post",
+          "Like the last 10 posts on your feed"
+        ]
+      },
+      {
+        "id": "food",
+        "name": "Food Dares",
+        "actions": [
+          "Eat a spoonful of mustard",
+          "Mix two weird foods and try it",
+          "Eat something spicy and try not to react"
+        ]
+      },
+      {
+        "id": "voice",
+        "name": "Voice Acting",
+        "actions": [
+          "Imitate your favorite cartoon character",
+          "Narrate a story dramatically",
+          "Make animal sounds for 30 seconds"
+        ]
+      },
+      {
+        "id": "truthbomb",
+        "name": "Truth Bomb",
+        "actions": [
+          "Say something you've never told anyone",
+          "Confess a secret you’re hiding",
+          "Tell a hidden truth about someone in the room"
+        ]
+      },
+      {
+        "id": "random",
+        "name": "Random Challenge",
+        "actions": [
+          "Do something the group chooses",
+          "Close your eyes and follow the next command",
+          "Let someone write a text for you to send"
+        ]
+      }
+    ],
+    "truth_questions": [
+      "What is your biggest fear?",
+      "Have you ever lied to your best friend?",
+      "What is your most embarrassing memory?",
+      "Do you have a secret crush?",
+      "What’s something you regret doing?",
+      "What’s a talent you’re secretly proud of?",
+      "Have you ever broken the law?",
+      "What’s the last lie you told?",
+      "What’s something you would never admit out loud?",
+      "If you could switch lives with someone, who would it be?"
+    ]
+  }
+  

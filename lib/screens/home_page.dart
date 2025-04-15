@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import '../widgets/adaptive_grid.dart';
-import '../utils/responsive.dart';
-import '../models/game_item.dart';
-import '../services/game_service.dart';
-import '../screens/about_page.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../providers/locale_provider.dart';
-import 'language_selector.dart';
 import 'package:provider/provider.dart';
+import '../services/game_data_service.dart';
+import 'category_page.dart';
+import '../screens/about_page.dart';
+import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
-
+import 'language_selector.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,56 +16,92 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<GameItem> _items = [];
-  bool _isLoading = true;
-  bool _showDeleted = false;
-  final List<GameItem> _deletedItems = [];
+  List categories = [];
+  List deletedCategories = [];
+  bool showDeleted = false;
+  bool isLoading = true;
 
   @override
-  void initState() {
-    super.initState();
-    _loadItems();
-  }
-
-  Future<void> _loadItems() async {
-    try {
-      final items = await GameService.fetchItems();
-      setState(() {
-        _items = items;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (categories.isEmpty && isLoading) {
+      loadCategories();
     }
   }
 
-  void _toggleDeletedItems() {
+  Future<void> loadCategories() async {
+    final locale = Localizations.localeOf(context);
+    final data = await GameDataService.loadGameData(locale);
     setState(() {
-      _showDeleted = !_showDeleted;
-      if (_showDeleted) {
-        _items.addAll(_deletedItems);
+      categories = data['categories'];
+      isLoading = false;
+    });
+  }
+
+  void toggleDeletedCategories() {
+    setState(() {
+      showDeleted = !showDeleted;
+      if (showDeleted) {
+        categories.addAll(deletedCategories);
       } else {
-        _items.removeWhere((item) => _deletedItems.contains(item));
+        categories.removeWhere((item) => deletedCategories.contains(item));
       }
     });
   }
 
-  void _handleItemRemoval(GameItem item) {
+  void handleCategoryRemoval(dynamic category) {
     setState(() {
-      _items.remove(item);
-      _deletedItems.add(item);
+      categories.remove(category);
+      deletedCategories.add(category);
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(AppLocalizations.of(context)!.itemRemoved(item.title)),
+        content: Text(AppLocalizations.of(context)!.itemRemoved(category['name'])),
         action: SnackBarAction(
           label: AppLocalizations.of(context)!.undo,
-          onPressed:
-              () => setState(() {
-                _items.add(item);
-                _deletedItems.remove(item);
-              }),
+          onPressed: () => setState(() {
+            categories.add(category);
+            deletedCategories.remove(category);
+          }),
         ),
+      ),
+    );
+  }
+
+  IconData getCategoryIcon(String id) {
+    switch (id) {
+      case 'dance':
+        return Icons.music_note;
+      case 'call':
+        return Icons.call;
+      case 'fitness':
+        return Icons.fitness_center;
+      case 'selfie':
+        return Icons.photo_camera;
+      case 'robot':
+        return Icons.android;
+      case 'social':
+        return Icons.share;
+      case 'food':
+        return Icons.fastfood;
+      case 'voice':
+        return Icons.mic;
+      case 'truthbomb':
+        return Icons.bolt;
+      case 'random':
+        return Icons.shuffle;
+      default:
+        return Icons.extension;
+    }
+  }
+
+  void _navigateToAbout(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 700),
+        pageBuilder: (_, animation, secondaryAnimation) =>
+            FadeTransition(opacity: animation, child: const AboutPage()),
       ),
     );
   }
@@ -80,13 +113,11 @@ class _HomePageState extends State<HomePage> {
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
           IconButton(
-            // ⚡ Новая кнопка выбора языка
             icon: const Icon(Icons.language),
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LanguageSelector()),
-                ),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LanguageSelector()),
+            ),
           ),
           IconButton(
             icon: Icon(Theme.of(context).brightness == Brightness.dark
@@ -98,10 +129,9 @@ class _HomePageState extends State<HomePage> {
               themeProvider.toggleTheme(isDark);
             },
           ),
-
           IconButton(
-            icon: Icon(_showDeleted ? Icons.visibility_off : Icons.visibility),
-            onPressed: _toggleDeletedItems,
+            icon: Icon(showDeleted ? Icons.visibility_off : Icons.visibility),
+            onPressed: toggleDeletedCategories,
             tooltip: AppLocalizations.of(context)!.toggleVisibility,
           ),
           IconButton(
@@ -111,31 +141,76 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body:
-          _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : RefreshIndicator(
-                onRefresh: _loadItems,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  child: AdaptiveGrid(
-                    items: _items,
-                    onItemRemoved: _handleItemRemoval,
-                  ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: loadCategories,
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: categories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 3 / 4,
                 ),
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  final icon = getCategoryIcon(category['id']);
+                  return Dismissible(
+                    key: UniqueKey(),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (_) => handleCategoryRemoval(category),
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20),
+                      color: Colors.red,
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 6,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CategoryPage(category: category),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Icon(icon, size: 40, color: Colors.deepPurple),
+                              ),
+                              const SizedBox(height: 12),
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    category['name'],
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-    );
-  }
-
-  void _navigateToAbout(BuildContext context) {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 700),
-        pageBuilder:
-            (_, animation, secondaryAnimation) =>
-                FadeTransition(opacity: animation, child: const AboutPage()),
-      ),
+            ),
     );
   }
 }

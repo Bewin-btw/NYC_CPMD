@@ -11,5 +11,8 @@
   "toggleVisibility": "Toggle visibility",
   "about": "About",
   "doubleTap": "Double tapped",
-  "languageSettings": "Language Settings"
+  "languageSettings": "Language Settings",
+  "truth": "Truth",
+  "dare": "Dare",
+  "chooseAction": "Choose Truth or Dare"
 }
