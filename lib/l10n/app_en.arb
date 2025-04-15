@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "appTitle": "Truth or Dare",
+  "aboutTitle": "About This App",
+  "startGame": "Start Game",
+  "gameDescription": "Truth or Action is an engaging party game app...",
+  "credits": "👥 Credits",
+  "developedBy": "Developed by Aktaev Erik, Mukanova Alana, Amanbekova Aruzhan, Yermek Daulet\n\nIn the scope of the course “Crossplatform Development”\nat Astana IT University.\n\nMentor (Teacher): Assistant Professor Abzal Kyzyrkanov",
+  "itemRemoved": "Item {title} removed",
+  "undo": "Undo",
+  "toggleVisibility": "Toggle visibility",
+  "about": "About",
+  "doubleTap": "Double tapped",
+  "languageSettings": "Language Settings"
+}

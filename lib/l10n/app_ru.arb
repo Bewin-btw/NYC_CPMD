@@ -1,0 +1,15 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Правда или Действие",
+  "aboutTitle": "О приложении",
+  "startGame": "Начать игру",
+  "gameDescription": "Правда или Действие - увлекательная игра для компании...",
+  "credits": "👥 Авторы",
+  "developedBy": "Разработано Aktaev Erik, Mukanova Alana, Amanbekova Aruzhan, Yermek Daulet\n\nIn the scope of the course “Crossplatform Development”\nat Astana IT University.\n\nMentor (Teacher): Assistant Professor Abzal Kyzyrkanov",
+  "itemRemoved": "Элемент {title} удалён",
+  "undo": "Вернуть",
+  "toggleVisibility": "Показать/скрыть",
+  "about": "О программе",
+  "doubleTap": "Двойное нажатие",
+  "languageSettings": "Настройки языка"
+}

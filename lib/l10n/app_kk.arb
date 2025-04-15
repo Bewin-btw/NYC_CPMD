@@ -1,0 +1,15 @@
+{
+  "@@locale": "kk",
+  "appTitle": "Шын Немесе Іс-әрекет",
+  "aboutTitle": "Қолданба туралы",
+  "startGame": "Ойынды бастау",
+  "gameDescription": "Шын Немесе Іс-әрекет - достар арасында ойнауға арналған ойын...",
+  "credits": "👥 Авторлар",
+  "developedBy": "Жобалаушылар Aktaev Erik, Mukanova Alana, Amanbekova Aruzhan, Yermek Daulet\n\nIn the scope of the course “Crossplatform Development”\nat Astana IT University.\n\nMentor (Teacher): Assistant Professor Abzal Kyzyrkanov",
+  "itemRemoved": "{title} жойылды",
+  "undo": "Қайтару",
+  "toggleVisibility": "Көріністі өзгерту",
+  "about": "Бағдарлама туралы",
+  "doubleTap": "Екі рет басу",
+  "languageSettings": "Тіл параметрлері"
+}
