@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/locale_provider.dart'; // ⚡ Новый импорт
 import 'screens/about_page.dart';
 import 'utils/constants.dart';
+import 'providers/theme_provider.dart';
+
 
 void main() async { // ⚡ Добавлено async
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,11 +15,15 @@ void main() async { // ⚡ Добавлено async
   final languageCode = prefs.getString('languageCode');
   
   runApp(
-    ChangeNotifierProvider( // ⚡ Обернули в провайдер
-      create: (_) => LocaleProvider()..loadLocale(),
-      child: const MyApp(),
-    ),
-  );
+  MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => LocaleProvider()..loadLocale()),
+      ChangeNotifierProvider(create: (_) => ThemeProvider()), // 👈 добавили тему
+    ],
+    child: const MyApp(),
+  ),
+);
+
 }
 
 class MyApp extends StatelessWidget {
@@ -25,12 +31,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localeProvider = Provider.of<LocaleProvider>(context); // ⚡ Получаем провайдер
+    final localeProvider = Provider.of<LocaleProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context); // 👈 получаем провайдер темы
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Truth or Dare',
-      locale: localeProvider.locale, // ⚡ Динамическая локаль
+      locale: localeProvider.locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -56,7 +63,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: themeProvider.themeMode, // 👈 динамический режим темы
       home: const AboutPage(),
     );
   }

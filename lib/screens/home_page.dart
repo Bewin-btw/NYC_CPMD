@@ -7,6 +7,9 @@ import '../screens/about_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
 import 'language_selector.dart';
+import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -85,6 +88,17 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(builder: (_) => const LanguageSelector()),
                 ),
           ),
+          IconButton(
+            icon: Icon(Theme.of(context).brightness == Brightness.dark
+                ? Icons.light_mode
+                : Icons.dark_mode),
+            onPressed: () {
+              final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+              final isDark = Theme.of(context).brightness != Brightness.dark;
+              themeProvider.toggleTheme(isDark);
+            },
+          ),
+
           IconButton(
             icon: Icon(_showDeleted ? Icons.visibility_off : Icons.visibility),
             onPressed: _toggleDeletedItems,
