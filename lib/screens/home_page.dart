@@ -6,6 +6,7 @@ import '../screens/about_page.dart';
 import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
 import 'language_selector.dart';
+import '../utils/responsive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,14 +21,13 @@ class _HomePageState extends State<HomePage> {
   List deletedCategories = [];
   bool showDeleted = false;
   bool isLoading = true;
-  Locale? currentLocale; // 👈 следим за текущей локалью
+  Locale? currentLocale;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final locale = Localizations.localeOf(context);
 
-    // загружаем категории при первой загрузке и при смене языка
     if (currentLocale != locale) {
       currentLocale = locale;
       loadCategories();
@@ -45,11 +45,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void toggleDeletedCategories() {
-  setState(() {
-    showDeleted = !showDeleted;
-  });
-}
-
+    setState(() {
+      showDeleted = !showDeleted;
+    });
+  }
 
   void handleCategoryRemoval(dynamic category) {
     setState(() {
@@ -72,28 +71,17 @@ class _HomePageState extends State<HomePage> {
 
   IconData getCategoryIcon(String id) {
     switch (id) {
-      case 'dance':
-        return Icons.music_note;
-      case 'call':
-        return Icons.call;
-      case 'fitness':
-        return Icons.fitness_center;
-      case 'selfie':
-        return Icons.photo_camera;
-      case 'robot':
-        return Icons.android;
-      case 'social':
-        return Icons.share;
-      case 'food':
-        return Icons.fastfood;
-      case 'voice':
-        return Icons.mic;
-      case 'truthbomb':
-        return Icons.bolt;
-      case 'random':
-        return Icons.shuffle;
-      default:
-        return Icons.extension;
+      case 'dance': return Icons.music_note;
+      case 'call': return Icons.call;
+      case 'fitness': return Icons.fitness_center;
+      case 'selfie': return Icons.photo_camera;
+      case 'robot': return Icons.android;
+      case 'social': return Icons.share;
+      case 'food': return Icons.fastfood;
+      case 'voice': return Icons.mic;
+      case 'truthbomb': return Icons.bolt;
+      case 'random': return Icons.shuffle;
+      default: return Icons.extension;
     }
   }
 
@@ -107,8 +95,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  @override
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -150,19 +137,23 @@ class _HomePageState extends State<HomePage> {
               child: GridView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: showDeleted ? deletedCategories.length : categories.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: Responsive.gridCrossAxisCount(context),
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  childAspectRatio: 3 / 4,
+                  childAspectRatio: Responsive.gridChildAspectRatio(context),
                 ),
                 itemBuilder: (context, index) {
-                  final category = showDeleted ? deletedCategories[index] : categories[index];
+                  final category = showDeleted 
+                      ? deletedCategories[index] 
+                      : categories[index];
                   final icon = getCategoryIcon(category['id']);
 
                   return Dismissible(
                     key: UniqueKey(),
-                    direction: showDeleted ? DismissDirection.none : DismissDirection.endToStart,
+                    direction: showDeleted 
+                        ? DismissDirection.none 
+                        : DismissDirection.endToStart,
                     onDismissed: (_) => handleCategoryRemoval(category),
                     background: Container(
                       alignment: Alignment.centerRight,
@@ -207,7 +198,11 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Expanded(
-                                child: Icon(icon, size: 40, color: Colors.deepPurple),
+                                child: Icon(
+                                  icon,
+                                  size: Responsive.categoryIconSize(context),
+                                  color: Colors.deepPurple,
+                                ),
                               ),
                               const SizedBox(height: 12),
                               Expanded(
@@ -215,8 +210,8 @@ class _HomePageState extends State<HomePage> {
                                   child: Text(
                                     category['name'],
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                                    style: TextStyle(
+                                      fontSize: Responsive.categoryFontSize(context),
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -229,8 +224,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 },
-              )
-
+              ),
             ),
     );
   }

@@ -17,20 +17,13 @@ class AdaptiveGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isPortrait = MediaQuery.orientationOf(context) == Orientation.portrait;
-        final crossAxisCount = Responsive.getCrossAxisCount(
-          context,
-          portrait: isPortrait ? 2 : 3,
-          landscape: isPortrait ? 3 : 4,
-        );
-
         return GridView.builder(
           padding: const EdgeInsets.all(16),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
+            crossAxisCount: Responsive.gridCrossAxisCount(context),
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: isPortrait ? 0.8 : 1.2,
+            childAspectRatio: Responsive.gridChildAspectRatio(context),
           ),
           itemCount: items.length,
           itemBuilder: (context, index) => _buildGameCard(items[index], context),
@@ -43,11 +36,14 @@ class AdaptiveGrid extends StatelessWidget {
     return Hero(
       tag: item.id,
       child: GestureDetector(
-        onDoubleTap: () => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(
-      '${AppLocalizations.of(context)!.doubleTap}: ${item.title}'
-    )),
-        ),
+        onDoubleTap: () {
+          final loc = AppLocalizations.of(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${loc?.doubleTap ?? 'Double tap'}: ${item.title}'),
+            ),
+          );
+        },
         child: Card(
           elevation: 4,
           shape: RoundedRectangleBorder(
@@ -67,7 +63,8 @@ class AdaptiveGrid extends StatelessWidget {
                     child: Image.network(
                       item.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (ctx, error, stackTrace) => const Icon(Icons.error),
+                      errorBuilder: (ctx, error, stackTrace) => 
+                        const Icon(Icons.error, size: 50),
                     ),
                   ),
                 ),
@@ -79,6 +76,7 @@ class AdaptiveGrid extends StatelessWidget {
                       item.title,
                       style: Theme.of(context).textTheme.titleMedium,
                       maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
