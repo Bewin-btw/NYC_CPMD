@@ -27,19 +27,32 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final locale = Localizations.localeOf(context);
-    if (currentLocale != locale) {
+    if (currentLocale?.languageCode != locale.languageCode) {
       currentLocale = locale;
       loadCategories();
     }
   }
 
   Future<void> loadCategories() async {
-    setState(() => isLoading = true);
-    final data = await GameDataService.loadGameData(currentLocale!);
-    setState(() {
-      categories = data['categories'];
-      isLoading = false;
-    });
+    try {
+      setState(() => isLoading = true);
+      final locale = currentLocale ?? Localizations.localeOf(context);
+      final data = await GameDataService.loadGameData(locale);
+      
+      if (data.containsKey('categories')) {
+        setState(() {
+          categories = List<Map<String, dynamic>>.from(data['categories']);
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Invalid data format');
+      }
+    } catch (e) {
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading data: ${e.toString()}')),
+      );
+    }
   }
 
   void toggleDeletedCategories() => setState(() => showDeleted = !showDeleted);
@@ -85,7 +98,7 @@ class _HomePageState extends State<HomePage> {
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 700),
         pageBuilder: (_, animation, secondaryAnimation) =>
-          FadeTransition(opacity: animation, child: const AboutPage()),
+            FadeTransition(opacity: animation, child: const AboutPage()),
       ),
     );
   }
@@ -128,91 +141,98 @@ class _HomePageState extends State<HomePage> {
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: loadCategories,
-              child: GridView.builder(
-                padding: Responsive.gridPadding(context),
-                itemCount: showDeleted ? deletedCategories.length : categories.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: Responsive.gridCrossAxisCount(context),
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: Responsive.gridChildAspectRatio(context),
-                ),
-                itemBuilder: (context, index) {
-                  final category = showDeleted 
-                      ? deletedCategories[index] 
-                      : categories[index];
-                  final icon = getCategoryIcon(category['id']);
-
-                  return Dismissible(
-                    key: UniqueKey(),
-                    direction: showDeleted 
-                        ? DismissDirection.none 
-                        : DismissDirection.endToStart,
-                    onDismissed: (_) => handleCategoryRemoval(category),
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20),
-                      color: Colors.red,
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                      elevation: 4,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          if (!showDeleted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => CategoryPage(category: category),
-                              ),
-                            );
-                          }
-                        },
-                        onLongPress: () {
-                          if (showDeleted) {
-                            setState(() {
-                              deletedCategories.remove(category);
-                              categories.add(category);
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('${category['name']} восстановлена')),
-                            );
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Icon(
-                                  icon,
-                                  size: Responsive.categoryIconSize(context),
-                                  color: Colors.deepPurple,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Expanded(
-                                child: Text(
-                                  category['name'],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: Responsive.categoryFontSize(context),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+              child: categories.isEmpty
+                  ? Center(child: Text('No categories found'))
+                  : GridView.builder(
+                      padding: Responsive.gridPadding(context),
+                      itemCount: showDeleted ? deletedCategories.length : categories.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: Responsive.gridCrossAxisCount(context),
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: Responsive.gridChildAspectRatio(context),
                       ),
+                      itemBuilder: (context, index) {
+                        final category = showDeleted 
+                            ? deletedCategories[index] 
+                            : categories[index];
+                        final icon = getCategoryIcon(category['id']);
+
+                        return Dismissible(
+                          key: ValueKey(category['id']),
+                          direction: showDeleted 
+                              ? DismissDirection.none 
+                              : DismissDirection.endToStart,
+                          onDismissed: (_) => handleCategoryRemoval(category),
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            color: Colors.red,
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          child: Card(
+                            color: Theme.of(context).cardColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 4,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => !showDeleted 
+                                  ? Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => CategoryPage(category: category),
+                                      ),
+                                    )
+                                  : null,
+                              onLongPress: () {
+                                if (showDeleted) {
+                                  setState(() {
+                                    deletedCategories.remove(category);
+                                    categories.add(category);
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('${category['name']} восстановлена'),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Icon(
+                                        icon,
+                                        size: Responsive.categoryIconSize(context),
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Flexible(
+                                      child: Text(
+                                        category['name'] ?? 'Unnamed',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: Responsive.categoryFontSize(context),
+                                          fontWeight: FontWeight.w600,
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
     );
   }

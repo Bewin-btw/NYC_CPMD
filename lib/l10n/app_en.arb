@@ -14,5 +14,6 @@
   "languageSettings": "Language Settings",
   "truth": "Truth",
   "dare": "Dare",
-  "chooseAction": "Choose Truth or Dare"
+  "chooseAction": "Choose Truth or Dare",
+  "noCategories": "No categories available"
 }
