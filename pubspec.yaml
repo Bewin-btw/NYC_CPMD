@@ -62,7 +62,7 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - l10n/
+    - lib/l10n/
     - assets/lang/en_game_data.json
     - assets/lang/ru_game_data.json
     - assets/lang/kk_game_data.json 

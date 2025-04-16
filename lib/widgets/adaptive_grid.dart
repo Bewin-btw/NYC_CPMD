@@ -33,58 +33,64 @@ class AdaptiveGrid extends StatelessWidget {
   }
 
   Widget _buildGameCard(GameItem item, BuildContext context) {
-    return Hero(
-      tag: item.id,
-      child: GestureDetector(
-        onDoubleTap: () {
-          final loc = AppLocalizations.of(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${loc?.doubleTap ?? 'Double tap'}: ${item.title}'),
-            ),
-          );
-        },
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: () {},
-            onLongPress: () => onItemRemoved(item),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  flex: 7,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                    child: Image.network(
-                      item.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (ctx, error, stackTrace) => 
+  return Hero(
+    tag: item.id,
+    child: GestureDetector(
+      onDoubleTap: () {
+        final loc = AppLocalizations.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${loc?.doubleTap ?? 'Double tap'}: ${item.title}')),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {},
+          onLongPress: () => onItemRemoved(item),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 2,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  child: Image.network(
+                    item.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (ctx, error, stackTrace) =>
                         const Icon(Icons.error, size: 50),
-                    ),
                   ),
                 ),
-                Flexible(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Center(
                     child: Text(
                       item.title,
                       style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 8),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
+
+
 }

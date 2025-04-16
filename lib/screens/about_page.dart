@@ -1,4 +1,3 @@
-// screens/about_page.dart
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import '../utils/constants.dart';
@@ -32,57 +31,67 @@ class AboutPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(AppDimensions.padding),
-        child: Card(
-          elevation: 6,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.borderRadius),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: ListView(
-              children: [
-                Icon(Icons.games, size: 50, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(height: 16),
-                Text(
-                  '📱 ${loc.appTitle}',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.secondary,
+        child: SingleChildScrollView(
+          child: Card(
+            elevation: 6,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.borderRadius),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Icon(Icons.games, size: 50, color: Theme.of(context).colorScheme.primary),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  loc.gameDescription,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  textAlign: TextAlign.justify,
-                ),
-                const SizedBox(height: 30),
-                Text(
-                  loc.credits,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  loc.developedBy,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton.icon(
-                  onPressed: () => _navigateToHome(context),
-                  icon: const Icon(Icons.play_arrow),
-                  label: Text(loc.startGame),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Text(
+                      '📱 ${loc.appTitle}',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  Text(
+                    loc.gameDescription,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 30),
+                  Text(
+                    loc.credits,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    loc.developedBy,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 30),
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _navigateToHome(context),
+                      icon: const Icon(Icons.play_arrow),
+                      label: Text(loc.startGame),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -95,7 +104,7 @@ class AboutPage extends StatelessWidget {
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 700),
-        pageBuilder: (_, animation, secondaryAnimation) => SlideTransition(
+        pageBuilder: (_, animation, __) => SlideTransition(
           position: Tween<Offset>(
             begin: const Offset(1.0, 0.0),
             end: Offset.zero,

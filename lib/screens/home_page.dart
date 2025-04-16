@@ -144,96 +144,86 @@ class _HomePageState extends State<HomePage> {
               child: categories.isEmpty
                   ? Center(child: Text('No categories found'))
                   : GridView.builder(
-                      padding: Responsive.gridPadding(context),
-                      itemCount: showDeleted ? deletedCategories.length : categories.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: Responsive.gridCrossAxisCount(context),
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: Responsive.gridChildAspectRatio(context),
-                      ),
-                      itemBuilder: (context, index) {
-                        final category = showDeleted 
-                            ? deletedCategories[index] 
-                            : categories[index];
-                        final icon = getCategoryIcon(category['id']);
+  padding: Responsive.gridPadding(context),
+  itemCount: showDeleted ? deletedCategories.length : categories.length,
+  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: Responsive.gridCrossAxisCount(context),
+    crossAxisSpacing: 12,
+    mainAxisSpacing: 12,
+    childAspectRatio: Responsive.gridChildAspectRatio(context), // 🧠 важно!
+  ),
+  itemBuilder: (context, index) {
+    final category = showDeleted ? deletedCategories[index] : categories[index];
+    final icon = getCategoryIcon(category['id']);
 
-                        return Dismissible(
-                          key: ValueKey(category['id']),
-                          direction: showDeleted 
-                              ? DismissDirection.none 
-                              : DismissDirection.endToStart,
-                          onDismissed: (_) => handleCategoryRemoval(category),
-                          background: Container(
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 20),
-                            color: Colors.red,
-                            child: const Icon(Icons.delete, color: Colors.white),
-                          ),
-                          child: Card(
-                            color: Theme.of(context).cardColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 4,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: () => !showDeleted 
-                                  ? Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => CategoryPage(category: category),
-                                      ),
-                                    )
-                                  : null,
-                              onLongPress: () {
-                                if (showDeleted) {
-                                  setState(() {
-                                    deletedCategories.remove(category);
-                                    categories.add(category);
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('${category['name']} восстановлена'),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: Icon(
-                                        icon,
-                                        size: Responsive.categoryIconSize(context),
-                                        color: Theme.of(context).colorScheme.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Flexible(
-                                      child: Text(
-                                        category['name'] ?? 'Unnamed',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: Responsive.categoryFontSize(context),
-                                          fontWeight: FontWeight.w600,
-                                          color: Theme.of(context).colorScheme.onSurface,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+    return Dismissible(
+      key: ValueKey(category['id']),
+      direction: showDeleted ? DismissDirection.none : DismissDirection.endToStart,
+      onDismissed: (_) => handleCategoryRemoval(category),
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        color: Colors.red,
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      child: AspectRatio(
+  aspectRatio: Responsive.gridChildAspectRatio(context),
+  child: Card(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    elevation: 4,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        if (!showDeleted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CategoryPage(category: category),
             ),
+          );
+        }
+      },
+      onLongPress: () {
+        if (showDeleted) {
+          setState(() {
+            deletedCategories.remove(category);
+            categories.add(category);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${category['name']} восстановлена')),
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: Responsive.categoryIconSize(context),
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              category['name'],
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: Responsive.categoryFontSize(context),
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    ),
+  ),
+),
     );
+  },
+)));
   }
 }
