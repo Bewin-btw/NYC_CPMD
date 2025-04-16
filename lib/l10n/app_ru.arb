@@ -19,5 +19,9 @@
   "toggleVisibility": "Показать/Скрыть",
   "about": "О программе",
   "doubleTap": "Двойное нажатие",
-  "languageSettings": "Настройки языка"
+  "languageSettings": "Настройки языка",
+  "truth": "Правда",
+  "dare": "Действие",
+  "chooseAction": "Выбери правду или действие"
+
 }
