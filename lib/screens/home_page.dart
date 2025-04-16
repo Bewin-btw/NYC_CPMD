@@ -27,7 +27,6 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final locale = Localizations.localeOf(context);
-
     if (currentLocale != locale) {
       currentLocale = locale;
       loadCategories();
@@ -36,7 +35,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> loadCategories() async {
     setState(() => isLoading = true);
-
     final data = await GameDataService.loadGameData(currentLocale!);
     setState(() {
       categories = data['categories'];
@@ -44,11 +42,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void toggleDeletedCategories() {
-    setState(() {
-      showDeleted = !showDeleted;
-    });
-  }
+  void toggleDeletedCategories() => setState(() => showDeleted = !showDeleted);
 
   void handleCategoryRemoval(dynamic category) {
     setState(() {
@@ -91,11 +85,12 @@ class _HomePageState extends State<HomePage> {
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 700),
         pageBuilder: (_, animation, secondaryAnimation) =>
-            FadeTransition(opacity: animation, child: const AboutPage()),
+          FadeTransition(opacity: animation, child: const AboutPage()),
       ),
     );
   }
-    @override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -113,9 +108,8 @@ class _HomePageState extends State<HomePage> {
                 ? Icons.light_mode
                 : Icons.dark_mode),
             onPressed: () {
-              final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-              final isDark = Theme.of(context).brightness != Brightness.dark;
-              themeProvider.toggleTheme(isDark);
+              Provider.of<ThemeProvider>(context, listen: false)
+                .toggleTheme(Theme.of(context).brightness != Brightness.dark);
             },
           ),
           IconButton(
@@ -135,12 +129,12 @@ class _HomePageState extends State<HomePage> {
           : RefreshIndicator(
               onRefresh: loadCategories,
               child: GridView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: Responsive.gridPadding(context),
                 itemCount: showDeleted ? deletedCategories.length : categories.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: Responsive.gridCrossAxisCount(context),
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
                   childAspectRatio: Responsive.gridChildAspectRatio(context),
                 ),
                 itemBuilder: (context, index) {
@@ -163,11 +157,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 6,
+                        borderRadius: BorderRadius.circular(16)),
+                      elevation: 4,
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
                         onTap: () {
                           if (!showDeleted) {
                             Navigator.push(
@@ -185,17 +178,14 @@ class _HomePageState extends State<HomePage> {
                               categories.add(category);
                             });
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${category['name']} восстановлена'),
-                              ),
+                              SnackBar(content: Text('${category['name']} восстановлена')),
                             );
                           }
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Expanded(
                                 child: Icon(
@@ -204,16 +194,14 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.deepPurple,
                                 ),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 8),
                               Expanded(
-                                child: Center(
-                                  child: Text(
-                                    category['name'],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: Responsive.categoryFontSize(context),
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                child: Text(
+                                  category['name'],
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: Responsive.categoryFontSize(context),
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
