@@ -45,15 +45,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void toggleDeletedCategories() {
-    setState(() {
-      showDeleted = !showDeleted;
-      if (showDeleted) {
-        categories.addAll(deletedCategories);
-      } else {
-        categories.removeWhere((item) => deletedCategories.contains(item));
-      }
-    });
-  }
+  setState(() {
+    showDeleted = !showDeleted;
+  });
+}
+
 
   void handleCategoryRemoval(dynamic category) {
     setState(() {
@@ -153,7 +149,7 @@ class _HomePageState extends State<HomePage> {
               onRefresh: loadCategories,
               child: GridView.builder(
                 padding: const EdgeInsets.all(16),
-                itemCount: categories.length,
+                itemCount: showDeleted ? deletedCategories.length : categories.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
@@ -161,11 +157,12 @@ class _HomePageState extends State<HomePage> {
                   childAspectRatio: 3 / 4,
                 ),
                 itemBuilder: (context, index) {
-                  final category = categories[index];
+                  final category = showDeleted ? deletedCategories[index] : categories[index];
                   final icon = getCategoryIcon(category['id']);
+
                   return Dismissible(
                     key: UniqueKey(),
-                    direction: DismissDirection.endToStart,
+                    direction: showDeleted ? DismissDirection.none : DismissDirection.endToStart,
                     onDismissed: (_) => handleCategoryRemoval(category),
                     background: Container(
                       alignment: Alignment.centerRight,
@@ -180,12 +177,29 @@ class _HomePageState extends State<HomePage> {
                       elevation: 6,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(20),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategoryPage(category: category),
-                          ),
-                        ),
+                        onTap: () {
+                          if (!showDeleted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CategoryPage(category: category),
+                              ),
+                            );
+                          }
+                        },
+                        onLongPress: () {
+                          if (showDeleted) {
+                            setState(() {
+                              deletedCategories.remove(category);
+                              categories.add(category);
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${category['name']} восстановлена'),
+                              ),
+                            );
+                          }
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Column(
@@ -215,7 +229,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 },
-              ),
+              )
+
             ),
     );
   }
