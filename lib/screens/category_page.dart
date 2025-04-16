@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../services/game_data_service.dart';
 import '../providers/theme_provider.dart';
+import '../providers/locale_provider.dart';
 
 class CategoryPage extends StatefulWidget {
   final Map<String, dynamic> category;
@@ -17,20 +18,48 @@ class CategoryPage extends StatefulWidget {
 class _CategoryPageState extends State<CategoryPage> {
   String displayedText = '';
   List<String> truthQuestions = [];
+  List<String> dareActions = [];
+  String categoryName = ''; // 👈 локализуемое название категории
+  Locale? currentLocale;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<LocaleProvider>(context, listen: false);
+      currentLocale = provider.locale;
+      loadData(); // загружаем и вопросы, и действия, и название
+    });
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (truthQuestions.isEmpty) {
-      loadTruthQuestions();
+
+    final provider = Provider.of<LocaleProvider>(context);
+    final newLocale = provider.locale ?? Localizations.localeOf(context);
+
+    if (currentLocale != newLocale) {
+      currentLocale = newLocale;
+      loadData(); // перезагрузка данных при смене языка
     }
   }
 
-  Future<void> loadTruthQuestions() async {
-    final locale = Localizations.localeOf(context);
+  Future<void> loadData() async {
+    final locale = currentLocale ?? Localizations.localeOf(context);
     final data = await GameDataService.loadGameData(locale);
+
+    final newCategory = data['categories']
+        .firstWhere((c) => c['id'] == widget.category['id'], orElse: () => null);
+
+    if (newCategory == null) return;
+
     setState(() {
       truthQuestions = List<String>.from(data['truth_questions']);
+      dareActions = List<String>.from(newCategory['actions']);
+      categoryName = newCategory['name'] ?? '';
+      displayedText = '';
     });
   }
 
@@ -43,10 +72,10 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   void showRandomDare() {
-    final actions = List<String>.from(widget.category['actions']);
+    if (dareActions.isEmpty) return;
     final random = Random();
     setState(() {
-      displayedText = actions[random.nextInt(actions.length)];
+      displayedText = dareActions[random.nextInt(dareActions.length)];
     });
   }
 
@@ -60,7 +89,7 @@ class _CategoryPageState extends State<CategoryPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(widget.category['name']),
+        title: Text(categoryName), // 👈 обновляемое название
         actions: [
           IconButton(
             icon: const Icon(Icons.language),
