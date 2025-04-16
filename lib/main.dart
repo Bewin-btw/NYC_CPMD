@@ -7,6 +7,7 @@ import 'providers/locale_provider.dart'; // ⚡ Новый импорт
 import 'screens/about_page.dart';
 import 'utils/constants.dart';
 import 'providers/theme_provider.dart';
+import 'screens/language_selector.dart';
 
 
 void main() async { // ⚡ Добавлено async
@@ -35,36 +36,40 @@ class MyApp extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context); // 👈 получаем провайдер темы
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Truth or Dare',
-      locale: localeProvider.locale,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ru'),
-        Locale('kk'),
-      ],
-      theme: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      themeMode: themeProvider.themeMode, // 👈 динамический режим темы
-      home: const AboutPage(),
-    );
+  debugShowCheckedModeBanner: false,
+  title: 'Truth or Dare',
+  locale: localeProvider.locale,
+  localizationsDelegates: const [
+    AppLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+  supportedLocales: const [
+    Locale('en'),
+    Locale('ru'),
+    Locale('kk'),
+  ],
+  theme: ThemeData.light().copyWith(
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      brightness: Brightness.light,
+    ),
+    useMaterial3: true,
+  ),
+  darkTheme: ThemeData.dark().copyWith(
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      brightness: Brightness.dark,
+    ),
+    useMaterial3: true,
+  ),
+  themeMode: themeProvider.themeMode,
+  routes: {
+    '/language': (_) => const LanguageSelector(),
+  },
+  home: const AboutPage(),
+);
+
   }
 }
