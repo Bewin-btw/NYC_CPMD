@@ -20,18 +20,24 @@ class _HomePageState extends State<HomePage> {
   List deletedCategories = [];
   bool showDeleted = false;
   bool isLoading = true;
+  Locale? currentLocale; // 👈 следим за текущей локалью
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (categories.isEmpty && isLoading) {
+    final locale = Localizations.localeOf(context);
+
+    // загружаем категории при первой загрузке и при смене языка
+    if (currentLocale != locale) {
+      currentLocale = locale;
       loadCategories();
     }
   }
 
   Future<void> loadCategories() async {
-    final locale = Localizations.localeOf(context);
-    final data = await GameDataService.loadGameData(locale);
+    setState(() => isLoading = true);
+
+    final data = await GameDataService.loadGameData(currentLocale!);
     setState(() {
       categories = data['categories'];
       isLoading = false;
