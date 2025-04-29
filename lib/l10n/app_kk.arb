@@ -24,6 +24,11 @@
   "truth": "Шындық",
   "dare": "Әрекет",
   "chooseAction": "Шындықты немесе әрекетті таңда",
-  "noCategories": "Қолжетімді санаттар жоқ"
+  "noCategories": "Қолжетімді санаттар жоқ",
+  "settingsTitle": "Баптаулар",
+  "darkTheme": "Қараңғы тақырып",
+  "language": "Тіл",
+  "backgroundMusic": "Фондық музыка"
+
 
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'package:provider/provider.dart';
 import '../utils/constants.dart';
+import '../providers/navigation_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AboutPage extends StatelessWidget {
@@ -100,18 +101,6 @@ class AboutPage extends StatelessWidget {
   }
 
   void _navigateToHome(BuildContext context) {
-    Navigator.pushReplacement(
-      context,
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 700),
-        pageBuilder: (_, animation, __) => SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(1.0, 0.0),
-            end: Offset.zero,
-          ).animate(animation),
-          child: const HomePage(),
-        ),
-      ),
-    );
+    Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
   }
 }

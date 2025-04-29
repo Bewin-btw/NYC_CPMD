@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/game_data_service.dart';
 import 'category_page.dart';
-import '../screens/about_page.dart';
 import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
-import 'language_selector.dart';
 import '../utils/responsive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -38,7 +36,7 @@ class _HomePageState extends State<HomePage> {
       setState(() => isLoading = true);
       final locale = currentLocale ?? Localizations.localeOf(context);
       final data = await GameDataService.loadGameData(locale);
-      
+
       if (data.containsKey('categories')) {
         setState(() {
           categories = List<Map<String, dynamic>>.from(data['categories']);
@@ -92,17 +90,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _navigateToAbout(BuildContext context) {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 700),
-        pageBuilder: (_, animation, secondaryAnimation) =>
-            FadeTransition(opacity: animation, child: const AboutPage()),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,30 +97,9 @@ class _HomePageState extends State<HomePage> {
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
           IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const LanguageSelector()),
-            ),
-          ),
-          IconButton(
-            icon: Icon(Theme.of(context).brightness == Brightness.dark
-                ? Icons.light_mode
-                : Icons.dark_mode),
-            onPressed: () {
-              Provider.of<ThemeProvider>(context, listen: false)
-                .toggleTheme(Theme.of(context).brightness != Brightness.dark);
-            },
-          ),
-          IconButton(
             icon: Icon(showDeleted ? Icons.visibility_off : Icons.visibility),
             onPressed: toggleDeletedCategories,
             tooltip: AppLocalizations.of(context)!.toggleVisibility,
-          ),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () => _navigateToAbout(context),
-            tooltip: AppLocalizations.of(context)!.about,
           ),
         ],
       ),
@@ -144,86 +110,88 @@ class _HomePageState extends State<HomePage> {
               child: categories.isEmpty
                   ? Center(child: Text('No categories found'))
                   : GridView.builder(
-  padding: Responsive.gridPadding(context),
-  itemCount: showDeleted ? deletedCategories.length : categories.length,
-  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: Responsive.gridCrossAxisCount(context),
-    crossAxisSpacing: 12,
-    mainAxisSpacing: 12,
-    childAspectRatio: Responsive.gridChildAspectRatio(context), // 🧠 важно!
-  ),
-  itemBuilder: (context, index) {
-    final category = showDeleted ? deletedCategories[index] : categories[index];
-    final icon = getCategoryIcon(category['id']);
+                      padding: Responsive.gridPadding(context),
+                      itemCount: showDeleted ? deletedCategories.length : categories.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: Responsive.gridCrossAxisCount(context),
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: Responsive.gridChildAspectRatio(context),
+                      ),
+                      itemBuilder: (context, index) {
+                        final category = showDeleted ? deletedCategories[index] : categories[index];
+                        final icon = getCategoryIcon(category['id']);
 
-    return Dismissible(
-      key: ValueKey(category['id']),
-      direction: showDeleted ? DismissDirection.none : DismissDirection.endToStart,
-      onDismissed: (_) => handleCategoryRemoval(category),
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        color: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      child: AspectRatio(
-  aspectRatio: Responsive.gridChildAspectRatio(context),
-  child: Card(
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    elevation: 4,
-    child: InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        if (!showDeleted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CategoryPage(category: category),
+                        return Dismissible(
+                          key: ValueKey(category['id']),
+                          direction: showDeleted ? DismissDirection.none : DismissDirection.endToStart,
+                          onDismissed: (_) => handleCategoryRemoval(category),
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            color: Colors.red,
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          child: AspectRatio(
+                            aspectRatio: Responsive.gridChildAspectRatio(context),
+                            child: Card(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              elevation: 4,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  if (!showDeleted) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => CategoryPage(category: category),
+                                      ),
+                                    );
+                                  }
+                                },
+                                onLongPress: () {
+                                  if (showDeleted) {
+                                    setState(() {
+                                      deletedCategories.remove(category);
+                                      categories.add(category);
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('${category['name']} восстановлена')),
+                                    );
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        icon,
+                                        size: Responsive.categoryIconSize(context),
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        category['name'],
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: Responsive.categoryFontSize(context),
+                                          fontWeight: FontWeight.w600,
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
-          );
-        }
-      },
-      onLongPress: () {
-        if (showDeleted) {
-          setState(() {
-            deletedCategories.remove(category);
-            categories.add(category);
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${category['name']} восстановлена')),
-          );
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: Responsive.categoryIconSize(context),
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              category['name'],
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: Responsive.categoryFontSize(context),
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    ),
-  ),
-),
     );
-  },
-)));
   }
 }

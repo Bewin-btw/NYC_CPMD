@@ -15,5 +15,10 @@
   "truth": "Truth",
   "dare": "Dare",
   "chooseAction": "Choose Truth or Dare",
-  "noCategories": "No categories available"
+  "noCategories": "No categories available",
+  "settingsTitle": "Settings",
+  "darkTheme": "Dark Theme",
+  "language": "Language",
+  "backgroundMusic": "Background Music"
+
 }

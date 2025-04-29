@@ -19,7 +19,7 @@ class _CategoryPageState extends State<CategoryPage> {
   String displayedText = '';
   List<String> truthQuestions = [];
   List<String> dareActions = [];
-  String categoryName = ''; // 👈 локализуемое название категории
+  String categoryName = '';
   Locale? currentLocale;
 
   @override
@@ -29,7 +29,7 @@ class _CategoryPageState extends State<CategoryPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<LocaleProvider>(context, listen: false);
       currentLocale = provider.locale;
-      loadData(); // загружаем и вопросы, и действия, и название
+      loadData();
     });
   }
 
@@ -42,7 +42,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
     if (currentLocale != newLocale) {
       currentLocale = newLocale;
-      loadData(); // перезагрузка данных при смене языка
+      loadData();
     }
   }
 
@@ -89,25 +89,7 @@ class _CategoryPageState extends State<CategoryPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(categoryName), // 👈 обновляемое название
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
-            onPressed: () => Navigator.pushNamed(context, '/language'),
-          ),
-          IconButton(
-            icon: Icon(
-              Theme.of(context).brightness == Brightness.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
-            ),
-            onPressed: () {
-              final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-              final isDark = Theme.of(context).brightness != Brightness.dark;
-              themeProvider.toggleTheme(isDark);
-            },
-          ),
-        ],
+        title: Text(categoryName),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),

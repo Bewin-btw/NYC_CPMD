@@ -23,6 +23,11 @@
   "truth": "Правда",
   "dare": "Действие",
   "chooseAction": "Выбери правду или действие",
-  "noCategories": "Нет доступных категорий"
+  "noCategories": "Нет доступных категорий",
+  "settingsTitle": "Настройки",
+  "darkTheme": "Тёмная тема",
+  "language": "Язык",
+  "backgroundMusic": "Фоновая музыка"
+
 
 }
