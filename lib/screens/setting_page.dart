@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../providers/theme_provider.dart';
 import '../providers/locale_provider.dart';
-import '../providers/audio_provider.dart'; // ✅ добавили AudioProvider
+import '../providers/audio_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'auth_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -17,7 +19,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final localeProvider = Provider.of<LocaleProvider>(context);
-    final audioProvider = Provider.of<AudioProvider>(context); // ✅
+    final audioProvider = Provider.of<AudioProvider>(context);
+
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null || user.isAnonymous;
 
     return Scaffold(
       appBar: AppBar(
@@ -27,14 +32,11 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // Темная тема
             SwitchListTile(
               title: Text(AppLocalizations.of(context)!.darkTheme),
               value: themeProvider.themeMode == ThemeMode.dark,
               onChanged: (value) => themeProvider.toggleTheme(value),
             ),
-
-            // Язык
             ListTile(
               title: Text(AppLocalizations.of(context)!.language),
               trailing: DropdownButton<Locale>(
@@ -52,13 +54,39 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: (locale) => localeProvider.setLocale(locale!),
               ),
             ),
-
-            // Музыка
             SwitchListTile(
               title: Text(AppLocalizations.of(context)!.backgroundMusic),
               value: audioProvider.isPlaying,
               onChanged: (value) => audioProvider.toggleMusic(value),
             ),
+            const Divider(),
+
+            if (isGuest)
+              ListTile(
+                leading: const Icon(Icons.login),
+                title: const Text('Login / Register'),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AuthPage()),
+                  );
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Logout'),
+                onTap: () async {
+                  await FirebaseAuth.instance.signOut();
+                  if (context.mounted) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AuthPage()),
+                      (route) => false,
+                    );
+                  }
+                },
+              ),
           ],
         ),
       ),
