@@ -53,13 +53,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-      final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-
-      await themeProvider.loadUserThemeFromFirebase();
-      await localeProvider.loadUserLanguageFromFirebase();
-    });
   }
 
   @override

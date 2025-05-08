@@ -31,7 +31,12 @@ class _AuthPageState extends State<AuthPage> {
     } else {
       final name = _nameController.text.trim();
       final age = _ageController.text.trim();
-      result = await auth.registerWithEmail(email, password, name: name, age: age);
+      result = await auth.registerWithEmail(
+        email,
+        password,
+        name: name,
+        age: age,
+      );
     }
 
     if (result != null) {
@@ -62,53 +67,56 @@ class _AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(isLogin ? 'Login' : 'Register')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            if (!isLogin)
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (!isLogin)
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                ),
+              if (!isLogin)
+                TextField(
+                  controller: _ageController,
+                  decoration: const InputDecoration(labelText: 'Age'),
+                  keyboardType: TextInputType.number,
+                ),
               TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
               ),
-            if (!isLogin)
               TextField(
-                controller: _ageController,
-                decoration: const InputDecoration(labelText: 'Age'),
-                keyboardType: TextInputType.number,
+                controller: _passwordController,
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
               ),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            if (error != null)
-              Text(error!, style: const TextStyle(color: Colors.red)),
-            ElevatedButton(
-              onPressed: _submit,
-              child: Text(isLogin ? 'Login' : 'Register'),
-            ),
-            TextButton(
-              onPressed: () => setState(() {
-                isLogin = !isLogin;
-                error = null;
-              }),
-              child: Text(isLogin
-                  ? 'Don\'t have an account? Register'
-                  : 'Already have an account? Login'),
-            ),
-            const Divider(),
-            ElevatedButton(
-              onPressed: _signInAsGuest,
-              child: const Text('Continue as Guest'),
-            ),
-          ],
+              const SizedBox(height: 20),
+              if (error != null)
+                Text(error!, style: const TextStyle(color: Colors.red)),
+              ElevatedButton(
+                onPressed: _submit,
+                child: Text(isLogin ? 'Login' : 'Register'),
+              ),
+              TextButton(
+                onPressed: () => setState(() {
+                  isLogin = !isLogin;
+                  error = null;
+                }),
+                child: Text(isLogin
+                    ? 'Don\'t have an account? Register'
+                    : 'Already have an account? Login'),
+              ),
+              const Divider(),
+              ElevatedButton(
+                onPressed: _signInAsGuest,
+                child: const Text('Continue as Guest'),
+              ),
+            ],
+          ),
         ),
       ),
     );
