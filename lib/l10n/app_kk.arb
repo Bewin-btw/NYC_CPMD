@@ -28,7 +28,14 @@
   "settingsTitle": "Баптаулар",
   "darkTheme": "Қараңғы тақырып",
   "language": "Тіл",
-  "backgroundMusic": "Фондық музыка"
-
+  "backgroundMusic": "Фондық музыка",
+  "profileTitle": "Профиль",
+"email": "Эл. пошта",
+"name": "Аты",
+"age": "Жасы",
+"logout": "Шығу",
+"noUserData": "Пайдаланушы деректері табылмады.",
+"login": "Кіру",
+"profileTitle": "Профиль"
 
 }

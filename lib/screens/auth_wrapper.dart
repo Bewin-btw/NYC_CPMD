@@ -15,11 +15,33 @@ class AuthWrapper extends StatelessWidget {
     await Provider.of<LocaleProvider>(context, listen: false).loadUserLanguageFromFirebase();
   }
 
+  Future<void> _loadGuestDefaults(BuildContext context) async {
+    await Provider.of<ThemeProvider>(context, listen: false).loadThemeFromPrefs();
+    await Provider.of<LocaleProvider>(context, listen: false).loadDefaultLocaleForGuest();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
+      if (user.isAnonymous) {
+        // ⏳ Гость — загружаем локальные настройки
+        return FutureBuilder(
+          future: _loadGuestDefaults(context),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return const MainNavigation();
+            } else {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+          },
+        );
+      }
+
+      // 👤 Зарегистрированный пользователь — из Firebase
       return FutureBuilder(
         future: _loadPreferences(context),
         builder: (context, snapshot) {
@@ -37,3 +59,4 @@ class AuthWrapper extends StatelessWidget {
     }
   }
 }
+

@@ -75,7 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
             else
               ListTile(
                 leading: const Icon(Icons.logout),
-                title: const Text('Logout'),
+                title: Text(AppLocalizations.of(context)!.logout),
                 onTap: () async {
                   await FirebaseAuth.instance.signOut();
                   if (context.mounted) {

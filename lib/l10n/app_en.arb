@@ -19,6 +19,13 @@
   "settingsTitle": "Settings",
   "darkTheme": "Dark Theme",
   "language": "Language",
-  "backgroundMusic": "Background Music"
-
+  "backgroundMusic": "Background Music",
+"profileTitle": "Profile",
+"email": "Email",
+"name": "Name",
+"age": "Age",
+"logout": "Logout",
+"noUserData": "No user data found.",
+"login": "Login",
+"profileTitle": "Profile"
 }

@@ -27,7 +27,14 @@
   "settingsTitle": "Настройки",
   "darkTheme": "Тёмная тема",
   "language": "Язык",
-  "backgroundMusic": "Фоновая музыка"
-
+  "backgroundMusic": "Фоновая музыка",
+  "profileTitle": "Профиль",
+"email": "Эл. почта",
+"name": "Имя",
+"age": "Возраст",
+"logout": "Выйти",
+"noUserData": "Данные пользователя не найдены.",
+"login": "Войти",
+"profileTitle": "Профиль"
 
 }

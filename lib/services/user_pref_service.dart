@@ -5,6 +5,7 @@ class UserPrefService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  /// Сохраняет настройки пользователя в Firestore
   Future<void> savePreferences({
     String? name,
     String? age,
@@ -16,6 +17,7 @@ class UserPrefService {
     if (user == null || user.isAnonymous) return;
 
     final Map<String, dynamic> data = {};
+
     if (name != null) data['name'] = name;
     if (age != null) data['age'] = age;
     if (email != null) data['email'] = email;
@@ -31,6 +33,8 @@ class UserPrefService {
       print('Ошибка при сохранении настроек: $e');
     }
   }
+
+  /// Загружает настройки пользователя из Firestore
   Future<Map<String, dynamic>?> loadPreferences() async {
     final user = _auth.currentUser;
     if (user == null || user.isAnonymous) return null;

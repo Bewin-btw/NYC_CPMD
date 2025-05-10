@@ -23,7 +23,10 @@ class ThemeProvider extends ChangeNotifier {
 
     notifyListeners();
   }
-
+Future<void> loadThemeFromPrefs() async {
+  _themeMode = ThemeMode.light; // Гостевой пользователь — всегда светлая тема
+  notifyListeners();
+}
   Future<void> loadUserThemeFromFirebase() async {
     final prefs = await UserPrefService().loadPreferences();
     if (prefs == null) return;

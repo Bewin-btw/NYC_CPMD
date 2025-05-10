@@ -16,7 +16,7 @@ import 'screens/home_page.dart';
 import 'screens/setting_page.dart';
 import 'screens/profile_page.dart'; // 👈 обязательно добавь
 import 'screens/auth_wrapper.dart';
-
+import 'screens/auth_page.dart';
 import 'utils/constants.dart';
 import 'services/auth_service.dart';
  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -59,40 +59,42 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final localeProvider = Provider.of<LocaleProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null || user.isAnonymous;
 
     return MaterialApp(
-      navigatorKey: navigatorKey,
-      debugShowCheckedModeBanner: false,
-      title: 'Truth or Dare',
-      locale: localeProvider.locale,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+    navigatorKey: navigatorKey,
+    debugShowCheckedModeBanner: false,
+    title: 'Truth or Dare',
+    locale: isGuest ? const Locale('en') : localeProvider.locale,
+    localizationsDelegates: const [
+      AppLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
       supportedLocales: const [
         Locale('en'),
         Locale('ru'),
         Locale('kk'),
       ],
       theme: ThemeData.light().copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primary,
+        brightness: Brightness.light,
       ),
-      darkTheme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
+      useMaterial3: true,
+    ),
+    darkTheme: ThemeData.dark().copyWith(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primary,
+        brightness: Brightness.dark,
       ),
-      themeMode: themeProvider.themeMode,
-      home: const AuthWrapper(),
-    );
+      useMaterial3: true,
+    ),
+    themeMode: isGuest ? ThemeMode.light : themeProvider.themeMode,
+    home: const AuthWrapper(),
+  );
   }
 }
 
@@ -110,35 +112,59 @@ class MainNavigation extends StatelessWidget {
     final screens = [
       const AboutPage(),
       const HomePage(),
-      const SettingsPage(),
-      if (!isGuest) const ProfilePage(),
-    ];
-
-    final items = [
-      const BottomNavigationBarItem(icon: Icon(Icons.info), label: 'About'),
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-      const BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
       if (!isGuest)
-        const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        const SettingsPage()
+      else
+        const Placeholder(), // временная заглушка, чтобы не ломать индексы
+      if (!isGuest)
+        const ProfilePage(),
     ];
 
-    // Безопасный индекс
+    final t = AppLocalizations.of(context)!;
+
+final items = [
+  BottomNavigationBarItem(icon: const Icon(Icons.info), label: t.about),
+  BottomNavigationBarItem(icon: const Icon(Icons.home), label: t.appTitle),
+  if (!isGuest)
+    BottomNavigationBarItem(icon: const Icon(Icons.settings), label: t.settingsTitle)
+  else
+    BottomNavigationBarItem(icon: const Icon(Icons.login), label: t.login),
+  if (!isGuest)
+    BottomNavigationBarItem(icon: const Icon(Icons.person), label: t.profileTitle),
+];
+
     final safeIndex = index >= screens.length ? 0 : index;
 
     return Scaffold(
-      body: screens[safeIndex],
-      bottomNavigationBar: BottomNavigationBar(
-  currentIndex: safeIndex,
-  onTap: navigationProvider.setIndex,
-  items: items,
-  type: BottomNavigationBarType.fixed,
-  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-  selectedItemColor: Theme.of(context).colorScheme.primary,
-  unselectedItemColor: Theme.of(context).unselectedWidgetColor,
-  selectedIconTheme: const IconThemeData(size: 26),
-  unselectedIconTheme: const IconThemeData(size: 22),
-),
+      body: Builder(
+        builder: (context) {
+          // Если это гость и нажал на Login (вместо settings), открываем AuthPage
+          if (isGuest && safeIndex == 2) {
+            // Переводим сразу на AuthPage
+            Future.microtask(() {
+              navigatorKey.currentState?.push(
+                MaterialPageRoute(builder: (_) => const AuthPage()),
+              );
+              // Сбросим index обратно на 1 (Home)
+              Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+            });
+            return const SizedBox.shrink(); // показываем пустоту на момент перехода
+          }
 
+          return screens[safeIndex];
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: safeIndex,
+        onTap: navigationProvider.setIndex,
+        items: items,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).unselectedWidgetColor,
+        selectedIconTheme: const IconThemeData(size: 26),
+        unselectedIconTheme: const IconThemeData(size: 22),
+      ),
     );
   }
 }

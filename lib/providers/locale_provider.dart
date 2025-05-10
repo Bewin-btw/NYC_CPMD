@@ -30,6 +30,10 @@ class LocaleProvider with ChangeNotifier {
     notifyListeners();
   }
 
+Future<void> loadDefaultLocaleForGuest() async {
+  _locale = const Locale('en'); // всегда английский
+  notifyListeners();
+}
   Future<void> loadLocale() async {
     // просто делегируем загрузку из Firestore
     await loadUserLanguageFromFirebase();
