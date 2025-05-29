@@ -7,6 +7,7 @@ import '../main.dart'; // MainNavigation
 import '../providers/theme_provider.dart';
 import '../providers/locale_provider.dart';
 
+
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 

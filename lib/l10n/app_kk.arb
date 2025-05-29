@@ -36,6 +36,8 @@
 "logout": "Шығу",
 "noUserData": "Пайдаланушы деректері табылмады.",
 "login": "Кіру",
-"profileTitle": "Профиль"
-
+"profileTitle": "Профиль",
+"syncNow": "Синхрондау",
+"syncFailedOffline": "❌ Интернетке қосылу жоқ. Синхрондау мүмкін емес.",
+"youAreOffline": "Сіз желіден тыссыз"
 }

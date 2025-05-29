@@ -27,5 +27,8 @@
 "logout": "Logout",
 "noUserData": "No user data found.",
 "login": "Login",
-"profileTitle": "Profile"
+"profileTitle": "Profile",
+"syncNow": "Sync Now",
+"syncFailedOffline": "❌ No internet connection. Unable to sync.",
+"youAreOffline": "You are offline"
 }

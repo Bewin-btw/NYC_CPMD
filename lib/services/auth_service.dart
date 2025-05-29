@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'local_storage_service.dart';
 
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final LocalStorageService _localStorage = LocalStorageService();
 
   User? get currentUser => _auth.currentUser;
 
@@ -19,12 +21,20 @@ class AuthService with ChangeNotifier {
         password: password,
       );
 
-      // Сохраняем доп. информацию в Firestore
-      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+      final uid = userCredential.user!.uid;
+
+      final userData = {
         'name': name,
         'age': age,
         'email': email.trim(),
-      });
+      };
+
+      await _firestore.collection('users').doc(uid).set(userData);
+      await _localStorage.saveUserData(
+        name: name,
+        age: age,
+        email: email.trim(),
+      );
 
       notifyListeners();
       return null;
@@ -41,10 +51,20 @@ class AuthService with ChangeNotifier {
         await _auth.signOut();
       }
 
-      await _auth.signInWithEmailAndPassword(
+      final credential = await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
+
+      final doc = await _firestore.collection('users').doc(credential.user!.uid).get();
+      if (doc.exists) {
+        final data = doc.data();
+        await _localStorage.saveUserData(
+          name: data?['name'] ?? '',
+          age: data?['age'] ?? '',
+          email: data?['email'] ?? '',
+        );
+      }
 
       notifyListeners();
       return null;
@@ -67,9 +87,21 @@ class AuthService with ChangeNotifier {
   // Выход
   Future<void> signOut() async {
     await _auth.signOut();
+    await _localStorage.clearUserData();
     notifyListeners();
   }
 
-  // Поток изменений авторизации
+  // Ручная синхронизация
+  Future<String> syncUserData() async {
+    final user = _auth.currentUser;
+    if (user == null || user.isAnonymous) return "Not logged in.";
+
+    final data = await _localStorage.getUserData();
+    if (data.isEmpty) return "No local data to sync.";
+
+    await _firestore.collection('users').doc(user.uid).set(data, SetOptions(merge: true));
+    return "Data synced successfully.";
+  }
+
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 }

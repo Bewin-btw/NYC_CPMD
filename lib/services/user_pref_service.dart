@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class UserPrefService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -7,15 +9,21 @@ class UserPrefService {
 
   /// Сохраняет настройки пользователя в Firestore
   Future<void> savePreferences({
-    String? name,
-    String? age,
-    String? email,
-    String? languageCode,
-    bool? isDarkMode,
-  }) async {
-    final user = _auth.currentUser;
-    if (user == null || user.isAnonymous) return;
+  String? name,
+  String? age,
+  String? email,
+  String? languageCode,
+  bool? isDarkMode,
+}) async {
+  final user = _auth.currentUser;
 
+  // 🔸 Сохраняем локально
+  final prefs = await SharedPreferences.getInstance();
+  if (languageCode != null) await prefs.setString('language', languageCode);
+  if (isDarkMode != null) await prefs.setBool('isDarkMode', isDarkMode);
+
+  // 🔸 Пытаемся сохранить в Firestore
+  if (user != null && !user.isAnonymous) {
     final Map<String, dynamic> data = {};
 
     if (name != null) data['name'] = name;
@@ -30,21 +38,34 @@ class UserPrefService {
         SetOptions(merge: true),
       );
     } catch (e) {
-      print('Ошибка при сохранении настроек: $e');
+      print('Ошибка при сохранении в Firebase: $e');
     }
   }
+}
+
 
   /// Загружает настройки пользователя из Firestore
-  Future<Map<String, dynamic>?> loadPreferences() async {
-    final user = _auth.currentUser;
-    if (user == null || user.isAnonymous) return null;
+  Future<Map<String, dynamic>> loadPreferences() async {
+  final prefs = await SharedPreferences.getInstance();
 
+  final Map<String, dynamic> result = {
+    'language': prefs.getString('language'),
+    'isDarkMode': prefs.getBool('isDarkMode'),
+  };
+
+  final user = _auth.currentUser;
+  if (user != null && !user.isAnonymous) {
     try {
       final doc = await _firestore.collection('users').doc(user.uid).get();
-      return doc.exists ? doc.data() : null;
+      if (doc.exists) {
+        result.addAll(doc.data() ?? {});
+      }
     } catch (e) {
-      print('Ошибка при загрузке настроек: $e');
-      return null;
+      print('Ошибка при загрузке из Firebase: $e');
     }
   }
+
+  return result;
+}
+
 }
